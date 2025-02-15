@@ -1,0 +1,49 @@
+// ==UserScript==
+// @name        Spam Elimin
+// @namespace        http://tampermonkey.net/
+// @version        0.1
+// @description        宣伝ブログのページに半透過マスクを表示
+// @author        Ameba Blog User
+// @match        https://ameblo.jp/*
+// @noframes
+// @grant        none
+// ==/UserScript==
+
+let fuse=0; // キャンセルフラグ
+
+let target=document.querySelector('head'); // 監視 target
+let monitor=new MutationObserver(page_check);
+monitor.observe(target, {childList: true}); // 監視開始
+
+function page_check(){
+    let path=location.pathname.split('/');
+    if(path[2]=='' || !path[2]){ // ブログトップページでのみチェック実行
+
+        let ambH=document.querySelector('#ambHeader');
+        let ptime_n=document.querySelector('.skin-entryPubdate time');
+        let ptime_o=document.querySelector('.articleTime time');
+        if(ambH && ptime_n){ // ブログページが表示済　新タイプスキン
+            let pager=document.querySelector('.skin-paging a');
+            if(pager){
+                ambH.style.boxShadow='none'; }
+            else{
+                if(fuse==0){
+                    ambH.style.boxShadow='0 0 0 200vw rgb(255 255 255 / 90%)';
+                    read_this(ambH); }}}
+
+        if(ambH && ptime_o){ // ブログページが表示済　旧タイプスキン
+            let pager=document.querySelector('.pagingArea a');
+            if(pager){
+                ambH.style.boxShadow='none'; }
+            else{
+                if(fuse==0){
+                    ambH.style.boxShadow='0 0 0 200vw rgb(255 255 255 / 90%)';
+                    read_this(ambH); }}}
+
+        function read_this(ambheader){
+            ambheader.onclick=function(){
+                fuse=1;
+                ambheader.style.boxShadow='none'; }}
+
+    }} // blog_page()
+
